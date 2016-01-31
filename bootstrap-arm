@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cmake  -G "Eclipse CDT4 - Unix Makefiles"   $*
+cmake  -DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake -G "Eclipse CDT4 - Unix Makefiles"   $*
