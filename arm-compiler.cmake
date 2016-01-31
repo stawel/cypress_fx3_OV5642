@@ -25,6 +25,7 @@ set(FX3_PATH $ENV{FX3_INSTALL_PATH})
 # -g3 -I"/home/stawel/Cypress/cyfx3sdk/boot_lib/1_3_3/include" -std=gnu11 -MMD -MP -MF"main.d" -MT"main.o" -c -o "main.o" "../main.c"
 
 include_directories("${FX3_PATH}/boot_lib/1_3_3/include")
+include_directories("${FX3_PATH}/fw_lib/1_3_3/inc")
 
 SET(CTUNING "-fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections")
 SET(CPU_FLAGS "-mcpu=arm926ej-s -marm -mthumb-interwork")
@@ -44,6 +45,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXXFLAGS} -ffunction-sections -fdata-s
 # -Wl,-Map,"BootLedBlink.map" -Wl,-d -Wl,-elf -Wl,--no-wchar-size-warning 
 # -Wl,--entry,Reset_Handler -o "BootLedBlink.elf"  ./cyfx_gcc_startup.o ./main.o   -lcyfx3boot -lc -lgcc
 
+link_directories(${FX3_PATH}/boot_lib/1_3_3/lib)
 link_directories(${FX3_PATH}/boot_lib/1_3_3/lib)
 set(LINKER_FLAGS "-T ${FX3_PATH}/fw_build/boot_fw/cyfx3.ld -nostartfiles -Xlinker --gc-sections  -Wl,-d -Wl,-elf -Wl,--no-wchar-size-warning  -Wl,--entry,Reset_Handler")
 set(CMAKE_EXE_LINKER_FLAGS "${LINKER_FLAGS}")
