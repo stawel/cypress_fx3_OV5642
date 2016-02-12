@@ -162,6 +162,8 @@ CyFxUsbI2cTransfer (
             status = CyU3PI2cReceiveBytes (&preamble, buffer, (pageCount == 1) ? resCount : glI2cPageSize, 0);
             if (status != CY_U3P_SUCCESS)
             {
+                CyU3PDebugPrint (2, "read error - dev: 0x%x, address: 0x%x, size: 0x%x, pages: 0x%x status : %d.\r\n",
+                        devAddr, byteAddress, byteCount, pageCount, status);
                 return status;
             }
         }
@@ -177,6 +179,8 @@ CyFxUsbI2cTransfer (
             status = CyU3PI2cTransmitBytes (&preamble, buffer, (pageCount == 1) ? resCount : glI2cPageSize, 0);
             if (status != CY_U3P_SUCCESS)
             {
+                CyU3PDebugPrint (2, "write error - dev: 0x%x, address: 0x%x, size: 0x%x, pages: 0x%x status : %d.\r\n",
+                        devAddr, byteAddress, byteCount, pageCount, status);
                 return status;
             }
 
@@ -255,7 +259,8 @@ CyFxUSBSetupCB (
                 break;
 
             case CY_FX_RQT_I2C_EEPROM_WRITE:
-                i2cAddr = 0xA0 | ((wValue & 0x0007) << 1);
+                //i2cAddr = 0xA0 | ((wValue & 0x0007) << 1);
+            	i2cAddr = wValue & 0x00fe;
                 status  = CyU3PUsbGetEP0Data(wLength, glEp0Buffer, NULL);
                 if (status == CY_U3P_SUCCESS)
                 {
@@ -265,7 +270,8 @@ CyFxUSBSetupCB (
                 break;
 
             case CY_FX_RQT_I2C_EEPROM_READ:
-                i2cAddr = 0xA0 | ((wValue & 0x0007) << 1);
+//                i2cAddr = 0xA0 | ((wValue & 0x0007) << 1);
+            	i2cAddr = wValue & 0x00fe;
                 CyU3PMemSet (glEp0Buffer, 0, sizeof (glEp0Buffer));
                 status = CyFxUsbI2cTransfer (wIndex, i2cAddr, wLength,
                         glEp0Buffer, CyTrue);
