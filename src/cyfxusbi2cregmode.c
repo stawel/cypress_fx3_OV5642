@@ -36,6 +36,8 @@
 #include "cyu3uart.h"
 #include "cyfxusbi2cregmode.h"
 
+#include "cyu3gpio.h"
+
 CyU3PThread appThread;           /* Application thread object. */
 CyBool_t glIsApplnActive = CyFalse;
 
@@ -87,6 +89,57 @@ CyFxDebugInit (
 
     return status;
 }
+
+
+/* GPIO application initialization function. */
+
+#define CY_FX_PWM_PERIOD                 (20 - 1)   /* PWM time period. */
+#define CY_FX_PWM_50P_THRESHOLD          (10  - 1)   /* PWM threshold value for 50% duty cycle. */
+
+
+CyU3PReturnStatus_t
+CyFxGpioInit (void)
+{
+    CyU3PGpioClock_t gpioClock;
+    CyU3PGpioComplexConfig_t gpioConfig;
+    CyU3PReturnStatus_t apiRetStatus = CY_U3P_SUCCESS;
+
+    /* Init the GPIO module. The GPIO block will be running
+     * with a fast clock at SYS_CLK / 2 and slow clock is not
+     * used. For the DVK, the SYS_CLK is running at 403 MHz.*/
+    gpioClock.fastClkDiv = 2;
+    gpioClock.slowClkDiv = 0;
+    gpioClock.simpleDiv = CY_U3P_GPIO_SIMPLE_DIV_BY_2;
+    gpioClock.clkSrc = CY_U3P_SYS_CLK;
+    gpioClock.halfDiv = 0;
+
+    apiRetStatus = CyU3PGpioInit(&gpioClock, NULL);
+    if (apiRetStatus != 0)
+    {
+        /* Error Handling */
+        CyU3PDebugPrint (4, "CyU3PGpioInit failed, error code = %d\n", apiRetStatus);
+    }
+
+    /* Configure GPIO 50 as PWM output */
+    gpioConfig.outValue = CyFalse;
+    gpioConfig.inputEn = CyFalse;
+    gpioConfig.driveLowEn = CyTrue;
+    gpioConfig.driveHighEn = CyTrue;
+    gpioConfig.pinMode = CY_U3P_GPIO_MODE_PWM;
+    gpioConfig.intrMode = CY_U3P_GPIO_NO_INTR;
+    gpioConfig.timerMode = CY_U3P_GPIO_TIMER_HIGH_FREQ;
+    gpioConfig.timer = 0;
+    gpioConfig.period = CY_FX_PWM_PERIOD;
+    gpioConfig.threshold = CY_FX_PWM_50P_THRESHOLD;
+    apiRetStatus = CyU3PGpioSetComplexConfig(50, &gpioConfig);
+    if (apiRetStatus != CY_U3P_SUCCESS)
+    {
+        CyU3PDebugPrint (4, "CyU3PGpioSetComplexConfig failed, error code = %d\n",
+                apiRetStatus);
+    }
+    return apiRetStatus;
+}
+
 
 /* I2c initialization for EEPROM programming. */
 CyU3PReturnStatus_t
@@ -467,6 +520,14 @@ AppThread_Entry (
     }
 
     /* Initialize the application. */
+    status = CyFxGpioInit();
+    if (status != CY_U3P_SUCCESS)
+    {
+        goto handle_error;
+    }
+
+
+    /* Initialize the application. */
     status = CyFxUsbI2cInit ();
     if (status != CY_U3P_SUCCESS)
     {
@@ -561,7 +622,9 @@ main (void)
     io_cfg.gpioSimpleEn[0]  = 0;
     io_cfg.gpioSimpleEn[1]  = 0;
     io_cfg.gpioComplexEn[0] = 0;
-    io_cfg.gpioComplexEn[1] = 0;
+
+    //stawel GPIO 50 XCLK
+    io_cfg.gpioComplexEn[1] = 0x001C0000;
     status = CyU3PDeviceConfigureIOMatrix (&io_cfg);
     if (status != CY_U3P_SUCCESS)
     {
