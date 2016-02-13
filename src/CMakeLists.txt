@@ -1,5 +1,7 @@
 
-set(SRC   cyfx_gcc_startup.S  cyfxtx.c  cyfxusbenumdscr.c  cyfxusbi2cregmode.c  cyfxusbi2cregmode.h)
+#set(SRC   cyfx_gcc_startup.S  cyfxtx.c  cyfxusbenumdscr.c  cyfxusbi2cregmode.c  cyfxusbi2cregmode.h)
+
+set(SRC   cyfx_gcc_startup.S cyfxtx.c  cyfxuvcdscr.c  cyfxuvcinmem.c  cyfxuvcvidframes.c)
 
 set_source_files_properties(cyfx_gcc_startup.S PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
 
