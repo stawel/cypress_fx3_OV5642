@@ -70,6 +70,14 @@
 #include "camera_ptzcontrol.h"
 #include "cyfxgpif2config.h"
 
+
+CyU3PReturnStatus_t CyFxGpioInit (void);
+CyBool_t
+CyFxUVCApplnUSBSetupCB_old (
+        uint32_t setupdat0, /* SETUP Data 0 */
+        uint32_t setupdat1  /* SETUP Data 1 */
+        );
+
 /*************************************************************************************************
                                          Global Variables
  *************************************************************************************************/
@@ -535,14 +543,14 @@ CyFxUVCApplnDebugInit (
     }
 
     /* Initialize the Debug logger module. */
-    apiRetStatus = CyU3PDebugInit (CY_U3P_LPP_SOCKET_UART_CONS, 4);
+    apiRetStatus = CyU3PDebugInit (CY_U3P_LPP_SOCKET_UART_CONS, 8);
     if (apiRetStatus != CY_U3P_SUCCESS)
     {
         CyFxAppErrorHandler (apiRetStatus);
     }
 
     /* Disable log message headers. */
-    CyU3PDebugPreamble (CyFalse);
+//    CyU3PDebugPreamble (CyFalse);
 }
 
 /* I2C initialization. */
@@ -926,6 +934,8 @@ UVCAppThread_Entry (
 
     /* Initialize the I2C interface */
     CyFxUVCApplnI2CInit ();
+
+    CyFxGpioInit();
 
     /* Initialize the UVC Application */
     CyFxUVCApplnInit ();
@@ -1678,6 +1688,26 @@ main (
     io_cfg.useI2C           = CyTrue;   /* I2C is used for the sensor interface. */
     io_cfg.useI2S           = CyFalse;
     io_cfg.useSpi           = CyFalse;
+
+
+    CyU3PMemSet ((uint8_t *)&io_cfg, 0, sizeof(io_cfg));
+    io_cfg.isDQ32Bit = CyFalse;
+    io_cfg.s0Mode = CY_U3P_SPORT_INACTIVE;
+    io_cfg.s1Mode = CY_U3P_SPORT_INACTIVE;
+    io_cfg.useUart   = CyTrue;
+    io_cfg.useI2C    = CyTrue;
+    io_cfg.useI2S    = CyFalse;
+    io_cfg.useSpi    = CyFalse;
+    /* This mode is for SPI, UART and I2S. I2C is still enabled. */
+    io_cfg.lppMode   = CY_U3P_IO_MATRIX_LPP_UART_ONLY;
+    /* No GPIOs are enabled. */
+    io_cfg.gpioSimpleEn[0]  = 0;
+    io_cfg.gpioSimpleEn[1]  = 0;
+    io_cfg.gpioComplexEn[0] = 0;
+
+    //stawel GPIO 50 XCLK
+    io_cfg.gpioComplexEn[1] = 0x001C0000;
+
 
     apiRetStatus = CyU3PDeviceConfigureIOMatrix (&io_cfg);
     if (apiRetStatus != CY_U3P_SUCCESS)

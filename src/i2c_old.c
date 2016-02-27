@@ -13,7 +13,7 @@
 #include "uvc.h"
 #include "sensor.h"
 #include "camera_ptzcontrol.h"
-#include "cyfxgpif2config.h"
+//#include "cyfxgpif2config.h"
 
 
 /* GPIO application initialization function. */
@@ -25,7 +25,12 @@
 CyU3PReturnStatus_t
 CyFxGpioInit (void)
 {
-	CyU3PDebugPrint (4, "CyU3PGpioInit start");
+	CyU3PDebugPrint (4, "CyU3PGpioInit start4");
+	CyU3PDebugPrint (0, "CyU3PGpioInit start0");
+	CyU3PDebugPrint (8, "CyU3PGpioInit start8");
+
+	while(1);
+	return CY_U3P_SUCCESS;
 
     CyU3PGpioClock_t gpioClock;
     CyU3PGpioComplexConfig_t gpioConfig;
@@ -73,9 +78,9 @@ CyFxGpioInit (void)
 #define CY_FX_RQT_I2C_EEPROM_READ               (0xBB)
 
 const uint8_t glFirmwareID[32] __attribute__ ((aligned (32))) = { 'F', 'X', '3', ' ', 'I', '2', 'C', '\0' };
-//uint8_t glEp0Buffer[4096] __attribute__ ((aligned (32)));
+static uint8_t glEp0Buffer[4096] __attribute__ ((aligned (32)));
 
-uint16_t glI2cPageSize = 0x40;   /* I2C Page size to be used for transfers. */
+static uint16_t glI2cPageSize = 0x40;   /* I2C Page size to be used for transfers. */
 
 /* I2C read / write for programmer application. */
 CyU3PReturnStatus_t
@@ -166,7 +171,7 @@ CyFxUsbI2cTransfer (
 
 
 /* Callback to handle the USB Setup Requests and UVC Class events */
-static CyBool_t
+CyBool_t
 CyFxUVCApplnUSBSetupCB_old (
         uint32_t setupdat0, /* SETUP Data 0 */
         uint32_t setupdat1  /* SETUP Data 1 */
@@ -174,7 +179,10 @@ CyFxUVCApplnUSBSetupCB_old (
 {
     CyBool_t uvcHandleReq = CyFalse;
     uint32_t status;
-    uint8_t  bType, bTarget;
+    uint8_t  bRequest, bmReqType;
+    uint8_t  bType;//, bTarget;
+    uint16_t wValue, wIndex, wLength;
+
 
     /* Obtain Request Type and Request */
     bmReqType = (uint8_t)(setupdat0 & CY_FX_USB_SETUP_REQ_TYPE_MASK);
@@ -185,7 +193,7 @@ CyFxUVCApplnUSBSetupCB_old (
     wLength   = (uint16_t)((setupdat1 & CY_FX_USB_SETUP_LENGTH_MASK) >> 16);
 
     bType    = (bmReqType & CY_U3P_USB_TYPE_MASK);
-    bTarget  = (bmReqType & CY_U3P_USB_TARGET_MASK);
+    //bTarget  = (bmReqType & CY_U3P_USB_TARGET_MASK);
 
     /* Handle supported vendor requests. */
     if (bType == CY_U3P_USB_VENDOR_RQT)
