@@ -25,12 +25,7 @@
 CyU3PReturnStatus_t
 CyFxGpioInit (void)
 {
-	CyU3PDebugPrint (4, "CyU3PGpioInit start4");
-	CyU3PDebugPrint (0, "CyU3PGpioInit start0");
-	CyU3PDebugPrint (8, "CyU3PGpioInit start8");
-
-	while(1);
-	return CY_U3P_SUCCESS;
+	CyU3PDebugPrint (4, "CyU3PGpioInit start4\n");
 
     CyU3PGpioClock_t gpioClock;
     CyU3PGpioComplexConfig_t gpioConfig;
@@ -40,7 +35,7 @@ CyFxGpioInit (void)
      * with a fast clock at SYS_CLK / 2 and slow clock is not
      * used. For the DVK, the SYS_CLK is running at 403 MHz.*/
     gpioClock.fastClkDiv = 2;
-    gpioClock.slowClkDiv = 0;
+    gpioClock.slowClkDiv = 2;
     gpioClock.simpleDiv = CY_U3P_GPIO_SIMPLE_DIV_BY_2;
     gpioClock.clkSrc = CY_U3P_SYS_CLK;
     gpioClock.halfDiv = 0;
@@ -184,6 +179,10 @@ CyFxUVCApplnUSBSetupCB_old (
     uint16_t wValue, wIndex, wLength;
 
 
+    CyU3PDebugPrint (2, "CyFxUVCApplnUSBSetupCB_old: %d %d\r\n",
+            setupdat0, setupdat1);
+
+
     /* Obtain Request Type and Request */
     bmReqType = (uint8_t)(setupdat0 & CY_FX_USB_SETUP_REQ_TYPE_MASK);
 
@@ -194,6 +193,8 @@ CyFxUVCApplnUSBSetupCB_old (
 
     bType    = (bmReqType & CY_U3P_USB_TYPE_MASK);
     //bTarget  = (bmReqType & CY_U3P_USB_TARGET_MASK);
+
+
 
     /* Handle supported vendor requests. */
     if (bType == CY_U3P_USB_VENDOR_RQT)

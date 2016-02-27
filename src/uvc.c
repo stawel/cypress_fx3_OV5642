@@ -277,6 +277,9 @@ CyFxUVCApplnUSBSetupCB (
     CyBool_t uvcHandleReq = CyFalse;
     uint32_t status;
 
+    if(CyFxUVCApplnUSBSetupCB_old(setupdat0, setupdat1) == CyTrue)
+    	return CyTrue;
+
     /* Obtain Request Type and Request */
     bmReqType = (uint8_t)(setupdat0 & CY_FX_USB_SETUP_REQ_TYPE_MASK);
     bRequest  = (uint8_t)((setupdat0 & CY_FX_USB_SETUP_REQ_MASK) >> 8);
@@ -550,7 +553,7 @@ CyFxUVCApplnDebugInit (
     }
 
     /* Disable log message headers. */
-//    CyU3PDebugPreamble (CyFalse);
+    CyU3PDebugPreamble (CyFalse);
 }
 
 /* I2C initialization. */
@@ -652,13 +655,13 @@ CyFxUVCApplnInit (void)
     gpioClock.halfDiv    = 0;
 
     /* Initialize Gpio interface */
-    apiRetStatus = CyU3PGpioInit (&gpioClock, NULL);
+/*    apiRetStatus = CyU3PGpioInit (&gpioClock, NULL);
     if (apiRetStatus != 0)
     {
         CyU3PDebugPrint (4, "GPIO Init failed, Error Code = %d\n", apiRetStatus);
         CyFxAppErrorHandler (apiRetStatus);
     }
-
+*/
     /* CTL pins are restricted and cannot be configured using I/O matrix configuration function,
      * must use GpioOverride to configure it */
     apiRetStatus = CyU3PDeviceGpioOverride (SENSOR_RESET_GPIO, CyTrue);
@@ -1678,6 +1681,7 @@ main (
     apiRetStatus = CyU3PDeviceCacheControl (CyTrue, CyFalse, CyFalse);
 
     /* Configure the IO matrix for the device. */
+    CyU3PMemSet ((uint8_t *)&io_cfg, 0, sizeof(io_cfg));
     io_cfg.isDQ32Bit        = CyTrue;
     io_cfg.lppMode          = CY_U3P_IO_MATRIX_LPP_DEFAULT;
     io_cfg.gpioSimpleEn[0]  = 0;
@@ -1689,25 +1693,8 @@ main (
     io_cfg.useI2S           = CyFalse;
     io_cfg.useSpi           = CyFalse;
 
-
-    CyU3PMemSet ((uint8_t *)&io_cfg, 0, sizeof(io_cfg));
-    io_cfg.isDQ32Bit = CyFalse;
-    io_cfg.s0Mode = CY_U3P_SPORT_INACTIVE;
-    io_cfg.s1Mode = CY_U3P_SPORT_INACTIVE;
-    io_cfg.useUart   = CyTrue;
-    io_cfg.useI2C    = CyTrue;
-    io_cfg.useI2S    = CyFalse;
-    io_cfg.useSpi    = CyFalse;
-    /* This mode is for SPI, UART and I2S. I2C is still enabled. */
-    io_cfg.lppMode   = CY_U3P_IO_MATRIX_LPP_UART_ONLY;
-    /* No GPIOs are enabled. */
-    io_cfg.gpioSimpleEn[0]  = 0;
-    io_cfg.gpioSimpleEn[1]  = 0;
-    io_cfg.gpioComplexEn[0] = 0;
-
     //stawel GPIO 50 XCLK
     io_cfg.gpioComplexEn[1] = 0x001C0000;
-
 
     apiRetStatus = CyU3PDeviceConfigureIOMatrix (&io_cfg);
     if (apiRetStatus != CY_U3P_SUCCESS)
