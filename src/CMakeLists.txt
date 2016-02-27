@@ -1,7 +1,9 @@
 
 #set(SRC   cyfx_gcc_startup.S  cyfxtx.c  cyfxusbenumdscr.c  cyfxusbi2cregmode.c  cyfxusbi2cregmode.h)
+#set(SRC   cyfx_gcc_startup.S cyfxtx.c  cyfxuvcdscr.c  cyfxuvcinmem.c  cyfxuvcvidframes.c)
 
-set(SRC   cyfx_gcc_startup.S cyfxtx.c  cyfxuvcdscr.c  cyfxuvcinmem.c  cyfxuvcvidframes.c)
+set(SRC   cyfx_gcc_startup.S
+camera_ptzcontrol.c  cyfxtx.c  cyfxuvcdscr.c  sensor.c  uvc.c)
 
 set_source_files_properties(cyfx_gcc_startup.S PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
 
