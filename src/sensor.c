@@ -135,7 +135,7 @@ static struct addrval_list ov5642_init[] = {
 {	0x3103,	0x93	},
 {	0x3008,	0x82	},
 {	0x3017,	0x7f	},
-{	0x3018,	0xfc	},
+//{	0x3018,	0xfc	},
 {	0x3810,	0xc2	},
 {	0x3615,	0xf0	},
 {	0x3000,	0x0		},
@@ -595,7 +595,7 @@ static struct addrval_list ov5642_init[] = {
 
 static struct addrval_list ov5642_final[] = {
 {	0x3810,	0xc2	},
-{	0x3818,	0xc9	},
+//{	0x3818,	0xc9	},
 {	0x381c,	0x10	},
 {	0x381d,	0xa0	},
 {	0x381e,	0x5		},
@@ -693,13 +693,51 @@ void SensorScaling_VGA(void) {
     return;
 }
 
+#define REG_WINDOW_START_X_HIGH         0x3800
+#define REG_WINDOW_START_X_LOW          0x3801
+#define REG_WINDOW_START_Y_HIGH         0x3802
+#define REG_WINDOW_START_Y_LOW          0x3803
+#define REG_WINDOW_WIDTH_HIGH           0x3804
+#define REG_WINDOW_WIDTH_LOW            0x3805
+#define REG_WINDOW_HEIGHT_HIGH          0x3806
+#define REG_WINDOW_HEIGHT_LOW           0x3807
+#define REG_OUT_WIDTH_HIGH              0x3808
+#define REG_OUT_WIDTH_LOW               0x3809
+#define REG_OUT_HEIGHT_HIGH             0x380a
+#define REG_OUT_HEIGHT_LOW              0x380b
+#define REG_OUT_TOTAL_WIDTH_HIGH        0x380c
+#define REG_OUT_TOTAL_WIDTH_LOW         0x380d
+#define REG_OUT_TOTAL_HEIGHT_HIGH       0x380e
+#define REG_OUT_TOTAL_HEIGHT_LOW        0x380f
+#define OV5642_WIDTH            1280
+#define OV5642_HEIGHT           720
+#define OV5642_TOTAL_WIDTH      3200
+#define OV5642_TOTAL_HEIGHT     2000
+#define OV5642_SENSOR_SIZE_X    2592
+#define OV5642_SENSOR_SIZE_Y    1944
+
+void setResolution(int width, int height)
+{
+	CyU3PDebugPrint(4, "setResolution: %dx%d !\r\n", width, height);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_WIDTH_HIGH, width >> 8);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_WIDTH_LOW, width & 0xff);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_HEIGHT_HIGH, height >> 8);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_HEIGHT_LOW, height & 0xff);
+
+	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_WIDTH_HIGH, width >> 8);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_WIDTH_LOW, width & 0xff);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_HEIGHT_HIGH, height >> 8);
+	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_HEIGHT_LOW, height & 0xff);
+
+}
+
 /* Function to set the image sensor in HD720 streaming mode. */
 void SensorScaling_HD720p_30fps(void) {
 /*	Populate particular sensor control commands that will setup the image sensor to stream
 	1280 * 720 at 30 FPS in this function.
  */
 
-
+	setResolution(1280, 720);
     return;
 }
 
