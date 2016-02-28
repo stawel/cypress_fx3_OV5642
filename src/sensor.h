@@ -28,13 +28,13 @@
 #include <cyu3types.h>
 
 /* I2C Slave address for the image sensor. */
-#define SENSOR_ADDR_WR 0xA0             /* Slave address used to write sensor registers. Default set to EEPROM. */
-#define SENSOR_ADDR_RD 0xA1             /* Slave address used to read from sensor registers. Default set to EEPROM */
+#define SENSOR_ADDR_WR 0x78             /* Slave address used to write sensor registers. Default set to EEPROM. */
+#define SENSOR_ADDR_RD 0x79             /* Slave address used to read from sensor registers. Default set to EEPROM */
 
 #define I2C_SLAVEADDR_MASK 0xFE         /* Mask to get actual I2C slave address value without direction bit. */
 
-#define I2C_MEMORY_ADDR_WR 0xA0         /* I2C slave address used to write to an EEPROM. */
-#define I2C_MEMORY_ADDR_RD 0xA1         /* I2C slave address used to read from an EEPROM. */
+//#define I2C_MEMORY_ADDR_WR 0xA0         /* I2C slave address used to write to an EEPROM. */
+//#define I2C_MEMORY_ADDR_RD 0xA1         /* I2C slave address used to read from an EEPROM. */
 
 /* GPIO 22 on FX3 is used to reset the Image sensor. */
 #define SENSOR_RESET_GPIO 22
@@ -48,6 +48,12 @@
                  highData  - High byte of data to be written.
                  lowData   - Low byte of data to be written.
  */
+
+
+extern CyU3PReturnStatus_t SensorWrite1B(uint8_t slaveAddr, uint16_t addr, uint8_t data);
+extern CyU3PReturnStatus_t SensorRead1B(uint8_t slaveAddr, uint16_t addr, uint8_t *buf);
+
+
 extern CyU3PReturnStatus_t
 SensorWrite2B (
         uint8_t slaveAddr,
