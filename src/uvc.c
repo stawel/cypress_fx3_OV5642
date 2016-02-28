@@ -432,6 +432,7 @@ CyFxUvcApplnDmaCallback (
         consCount++;
         streamingStarted = CyTrue;
     }
+    CyU3PDebugPrint (4, "CyFxUvcApplnDmaCallback type = %d\r\n", type);
 }
 
 /*
