@@ -656,13 +656,13 @@ CyFxUVCApplnInit (void)
     gpioClock.halfDiv    = 0;
 
     /* Initialize Gpio interface */
-/*    apiRetStatus = CyU3PGpioInit (&gpioClock, NULL);
+    apiRetStatus = CyU3PGpioInit (&gpioClock, NULL);
     if (apiRetStatus != 0)
     {
         CyU3PDebugPrint (4, "GPIO Init failed, Error Code = %d\n", apiRetStatus);
         CyFxAppErrorHandler (apiRetStatus);
     }
-*/
+
     /* CTL pins are restricted and cannot be configured using I/O matrix configuration function,
      * must use GpioOverride to configure it */
     apiRetStatus = CyU3PDeviceGpioOverride (SENSOR_RESET_GPIO, CyTrue);
@@ -969,6 +969,7 @@ UVCAppThread_Entry (
             apiRetStatus = CyU3PDmaMultiChannelGetBuffer (&glChHandleUVCStream, &produced_buffer, CYU3P_NO_WAIT);
             if (apiRetStatus == CY_U3P_SUCCESS)
             {
+            	CyU3PDebugPrint(4, "UVCAppThread_Entry produced_buffer.count = %d\r\n", produced_buffer.count);
                 if (produced_buffer.count == CY_FX_UVC_BUF_FULL_SIZE)
                 {
                     CyFxUVCAddHeader (produced_buffer.buffer - CY_FX_UVC_MAX_HEADER, CY_FX_UVC_HEADER_FRAME);
@@ -1695,7 +1696,7 @@ main (
     io_cfg.useSpi           = CyFalse;
 
     //stawel GPIO 50 XCLK
-    io_cfg.gpioComplexEn[1] = 0x001C0000;
+//    io_cfg.gpioComplexEn[1] = 0x001C0000;
 
     apiRetStatus = CyU3PDeviceConfigureIOMatrix (&io_cfg);
     if (apiRetStatus != CY_U3P_SUCCESS)

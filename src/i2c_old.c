@@ -25,6 +25,7 @@
 CyU3PReturnStatus_t
 CyFxGpioInit (void)
 {
+	return CY_U3P_SUCCESS;
 	CyU3PDebugPrint (4, "CyU3PGpioInit start4\n");
 
     CyU3PGpioClock_t gpioClock;
@@ -179,8 +180,12 @@ CyFxUVCApplnUSBSetupCB_old (
     uint16_t wValue, wIndex, wLength;
 
 
-    CyU3PDebugPrint (2, "CyFxUVCApplnUSBSetupCB_old: %d %d\r\n",
-            setupdat0, setupdat1);
+    //CyU3PDebugPrint (2, "CyFxUVCApplnUSBSetupCB_old: %d %d\r\n", setupdat0, setupdat1);
+
+    uint8_t curState_p;
+    CyU3PReturnStatus_t s;
+    s = CyU3PGpifGetSMState(&curState_p);
+    CyU3PDebugPrint (2, "CyFxUVCApplnUSBSetupCB_old: state %d %d\r\n", (int)curState_p, s);
 
 
     /* Obtain Request Type and Request */
