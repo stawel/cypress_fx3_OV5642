@@ -22,30 +22,22 @@
 #define CY_FX_PWM_50P_THRESHOLD          (10  - 1)   /* PWM threshold value for 50% duty cycle. */
 
 
+void CyFxAppErrorHandler (CyU3PReturnStatus_t apiRetStatus);
+
 CyU3PReturnStatus_t
 CyFxGpioInit (void)
 {
-	return CY_U3P_SUCCESS;
 	CyU3PDebugPrint (4, "CyU3PGpioInit start4\n");
 
-    CyU3PGpioClock_t gpioClock;
     CyU3PGpioComplexConfig_t gpioConfig;
     CyU3PReturnStatus_t apiRetStatus = CY_U3P_SUCCESS;
 
-    /* Init the GPIO module. The GPIO block will be running
-     * with a fast clock at SYS_CLK / 2 and slow clock is not
-     * used. For the DVK, the SYS_CLK is running at 403 MHz.*/
-    gpioClock.fastClkDiv = 2;
-    gpioClock.slowClkDiv = 2;
-    gpioClock.simpleDiv = CY_U3P_GPIO_SIMPLE_DIV_BY_2;
-    gpioClock.clkSrc = CY_U3P_SYS_CLK;
-    gpioClock.halfDiv = 0;
 
-    apiRetStatus = CyU3PGpioInit(&gpioClock, NULL);
+    apiRetStatus = CyU3PDeviceGpioOverride (SENSOR_XCLK_GPIO, CyFalse);
     if (apiRetStatus != 0)
     {
-        /* Error Handling */
-        CyU3PDebugPrint (4, "CyU3PGpioInit failed, error code = %d\n", apiRetStatus);
+        CyU3PDebugPrint (4, "GPIO Override failed, Error Code = %d\n", apiRetStatus);
+        CyFxAppErrorHandler (apiRetStatus);
     }
 
     /* Configure GPIO 50 as PWM output */
@@ -59,7 +51,7 @@ CyFxGpioInit (void)
     gpioConfig.timer = 0;
     gpioConfig.period = CY_FX_PWM_PERIOD;
     gpioConfig.threshold = CY_FX_PWM_50P_THRESHOLD;
-    apiRetStatus = CyU3PGpioSetComplexConfig(50, &gpioConfig);
+    apiRetStatus = CyU3PGpioSetComplexConfig(SENSOR_XCLK_GPIO, &gpioConfig);
     if (apiRetStatus != CY_U3P_SUCCESS)
     {
         CyU3PDebugPrint (4, "CyU3PGpioSetComplexConfig failed, error code = %d\n",

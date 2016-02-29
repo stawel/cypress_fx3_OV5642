@@ -38,6 +38,7 @@
 
 /* GPIO 22 on FX3 is used to reset the Image sensor. */
 #define SENSOR_RESET_GPIO 22
+#define SENSOR_XCLK_GPIO 50
 
 /* Function    : SensorWrite2B
    Description : Write two bytes of data to image sensor over I2C interface.

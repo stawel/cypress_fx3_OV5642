@@ -78,6 +78,7 @@ CyFxUVCApplnUSBSetupCB_old (
         uint32_t setupdat1  /* SETUP Data 1 */
         );
 
+
 /*************************************************************************************************
                                          Global Variables
  *************************************************************************************************/
@@ -277,8 +278,9 @@ CyFxUVCApplnUSBSetupCB (
     CyBool_t uvcHandleReq = CyFalse;
     uint32_t status;
 
-    if(CyFxUVCApplnUSBSetupCB_old(setupdat0, setupdat1) == CyTrue)
-    	return CyTrue;
+	if(CyFxUVCApplnUSBSetupCB_old(setupdat0, setupdat1) == CyTrue)
+           return CyTrue;
+
 
     /* Obtain Request Type and Request */
     bmReqType = (uint8_t)(setupdat0 & CY_FX_USB_SETUP_REQ_TYPE_MASK);
@@ -432,7 +434,6 @@ CyFxUvcApplnDmaCallback (
         consCount++;
         streamingStarted = CyTrue;
     }
-    CyU3PDebugPrint (4, "CyFxUvcApplnDmaCallback type = %d\r\n", type);
 }
 
 /*
@@ -547,7 +548,7 @@ CyFxUVCApplnDebugInit (
     }
 
     /* Initialize the Debug logger module. */
-    apiRetStatus = CyU3PDebugInit (CY_U3P_LPP_SOCKET_UART_CONS, 8);
+    apiRetStatus = CyU3PDebugInit (CY_U3P_LPP_SOCKET_UART_CONS, 4);
     if (apiRetStatus != CY_U3P_SUCCESS)
     {
         CyFxAppErrorHandler (apiRetStatus);
@@ -684,6 +685,9 @@ CyFxUVCApplnInit (void)
         CyU3PDebugPrint (4, "GPIO Set Config Error, Error Code = %d\n", apiRetStatus);
         CyFxAppErrorHandler (apiRetStatus);
     }
+
+    //stawel
+    CyFxGpioInit();
 
     /* Initialize the P-port. */
     pibclock.clkDiv      = 2;
@@ -939,8 +943,6 @@ UVCAppThread_Entry (
     /* Initialize the I2C interface */
     CyFxUVCApplnI2CInit ();
 
-    CyFxGpioInit();
-
     /* Initialize the UVC Application */
     CyFxUVCApplnInit ();
 
@@ -969,7 +971,6 @@ UVCAppThread_Entry (
             apiRetStatus = CyU3PDmaMultiChannelGetBuffer (&glChHandleUVCStream, &produced_buffer, CYU3P_NO_WAIT);
             if (apiRetStatus == CY_U3P_SUCCESS)
             {
-            	CyU3PDebugPrint(4, "UVCAppThread_Entry produced_buffer.count = %d\r\n", produced_buffer.count);
                 if (produced_buffer.count == CY_FX_UVC_BUF_FULL_SIZE)
                 {
                     CyFxUVCAddHeader (produced_buffer.buffer - CY_FX_UVC_MAX_HEADER, CY_FX_UVC_HEADER_FRAME);
@@ -1683,7 +1684,6 @@ main (
     apiRetStatus = CyU3PDeviceCacheControl (CyTrue, CyFalse, CyFalse);
 
     /* Configure the IO matrix for the device. */
-    CyU3PMemSet ((uint8_t *)&io_cfg, 0, sizeof(io_cfg));
     io_cfg.isDQ32Bit        = CyTrue;
     io_cfg.lppMode          = CY_U3P_IO_MATRIX_LPP_DEFAULT;
     io_cfg.gpioSimpleEn[0]  = 0;
@@ -1694,9 +1694,6 @@ main (
     io_cfg.useI2C           = CyTrue;   /* I2C is used for the sensor interface. */
     io_cfg.useI2S           = CyFalse;
     io_cfg.useSpi           = CyFalse;
-
-    //stawel GPIO 50 XCLK
-//    io_cfg.gpioComplexEn[1] = 0x001C0000;
 
     apiRetStatus = CyU3PDeviceConfigureIOMatrix (&io_cfg);
     if (apiRetStatus != CY_U3P_SUCCESS)
