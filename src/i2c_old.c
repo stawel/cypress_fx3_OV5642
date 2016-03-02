@@ -18,8 +18,8 @@
 
 /* GPIO application initialization function. */
 
-#define CY_FX_PWM_PERIOD                 (20 - 1)   /* PWM time period. */
-#define CY_FX_PWM_50P_THRESHOLD          (10  - 1)   /* PWM threshold value for 50% duty cycle. */
+#define CY_FX_PWM_PERIOD                 (8 - 1)   /* PWM time period. */
+#define CY_FX_PWM_50P_THRESHOLD          (4 - 1)   /* PWM threshold value for 50% duty cycle. */
 
 
 void CyFxAppErrorHandler (CyU3PReturnStatus_t apiRetStatus);
