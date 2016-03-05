@@ -34,132 +34,7 @@
 #include <cyu3gpio.h>
 #include <cyu3utils.h>
 #include "sensor.h"
-
-
-static void SensorI2CAccessDelay(CyU3PReturnStatus_t status) {
-	/* Add a 10us delay if the I2C operation that preceded this call was successful. */
-	if (status == CY_U3P_SUCCESS)
-		CyU3PBusyWait(10);
-}
-
-
-CyU3PReturnStatus_t SensorWrite1B(uint8_t slaveAddr, uint16_t addr, uint8_t data)
-{
-	CyU3PReturnStatus_t apiRetStatus = CY_U3P_SUCCESS;
-	CyU3PI2cPreamble_t preamble;
-	uint8_t buf[2];
-
-	preamble.buffer[0] = slaveAddr;
-	preamble.buffer[1] = addr>>8;
-	preamble.buffer[2] = addr&0xff;
-	preamble.length = 3; /*  Three byte preamble. */
-	preamble.ctrlMask = 0x0000; /*  No additional start and stop bits. */
-
-	buf[0] = data;
-
-	apiRetStatus = CyU3PI2cTransmitBytes(&preamble, buf, 1, 0);
-	SensorI2CAccessDelay(apiRetStatus);
-
-	return apiRetStatus;
-}
-
-struct addrval_list {
- uint16_t addr;
- uint8_t value;
- };
-
-
-CyU3PReturnStatus_t SensorConfig(struct addrval_list * config, int size)
-{
-	for(int i=0;i<size;i++) {
-		if(SensorWrite1B(SENSOR_ADDR_WR, config[i].addr, config[i].value) != CY_U3P_SUCCESS) {
-			CyU3PDebugPrint(4, "Error: SensorConfig: [%d] %x := %x !\r\n", i, config[i].addr, config[i].value);
-			return 1;
-		}
-	}
-	return CY_U3P_SUCCESS;
-}
-
-
-CyU3PReturnStatus_t SensorRead1B(uint8_t slaveAddr, uint16_t addr, uint8_t *buf)
-{
-	CyU3PReturnStatus_t apiRetStatus = CY_U3P_SUCCESS;
-	CyU3PI2cPreamble_t preamble;
-
-	preamble.buffer[0] = slaveAddr & I2C_SLAVEADDR_MASK; /*  Mask out the transfer type bit. */
-	preamble.buffer[1] = addr >> 8;
-	preamble.buffer[2] = addr & 0xff;
-	preamble.buffer[3] = slaveAddr;
-	preamble.length = 4;
-	preamble.ctrlMask = 0x0004; /*  Send start bit after third byte of preamble. */
-
-	apiRetStatus = CyU3PI2cReceiveBytes(&preamble, buf, 1, 0);
-	SensorI2CAccessDelay(apiRetStatus);
-
-	return apiRetStatus;
-}
-
-
-/*
- * Reset the image sensor using GPIO.
- */
-void SensorReset(void) {
-	CyU3PReturnStatus_t apiRetStatus;
-
-	/* Drive the GPIO low to reset the sensor. */
-	apiRetStatus = CyU3PGpioSetValue(SENSOR_RESET_GPIO, CyFalse);
-	if (apiRetStatus != CY_U3P_SUCCESS) {
-		CyU3PDebugPrint(4, "GPIO Set Value Error, Error Code = %d\n",
-				apiRetStatus);
-		return;
-	}
-
-	/* Wait for some time to allow proper reset. */
-	CyU3PThreadSleep(10);
-
-	/* Drive the GPIO high to bring the sensor out of reset. */
-	apiRetStatus = CyU3PGpioSetValue(SENSOR_RESET_GPIO, CyTrue);
-	if (apiRetStatus != CY_U3P_SUCCESS) {
-		CyU3PDebugPrint(4, "GPIO Set Value Error, Error Code = %d\n",
-				apiRetStatus);
-		return;
-	}
-
-	/* Delay the allow the sensor to power up. */
-	CyU3PThreadSleep(10);
-	return;
-}
-
-
-//OV5642_RGB_QVGA
-static struct addrval_list ov5642_init2[] = {
-#include "config.h"
-};
-
-
-#define sizeofArray(x) (sizeof(x)/sizeof(x[0]))
-
-/* Image sensor initialization sequence. */
-void SensorInit(void) {
-	if (SensorI2cBusTest() != CY_U3P_SUCCESS) /* Verify that the sensor is connected. */
-	{
-		CyU3PDebugPrint(4, "Error: Reading Sensor ID failed!\r\n");
-		return;
-	}
-
-	SensorConfig(ov5642_init2, sizeofArray(ov5642_init2));
-
-	/* Update sensor configuration based on desired video stream parameters. Using 720p 30fps as default setting.*/
-	//SensorScaling_HD720p_30fps();
-
-//	SensorConfig(ov5642_final, sizeofArray(ov5642_final));
-}
-
-
-
-/*
-   Verify that the sensor can be accessed over the I2C bus from FX3.
- */
+#include "../i2c.h"
 
 #define REG_CHIP_ID_HIGH                0x300a
 #define REG_CHIP_ID_LOW                 0x300b
@@ -176,6 +51,40 @@ uint8_t SensorI2cBusTest(void) {
 		return CY_U3P_SUCCESS;
 	}
 	return 1;
+}
+
+
+
+void SensorReset(void) {
+	CyU3PThreadSleep(10);
+	CyU3PThreadSleep(10);
+	return;
+}
+
+
+//OV5642_RGB_QVGA
+static struct addrval_list ov5642_init2[] = {
+#include "config.h"
+		{0xffff,0xff}
+};
+
+
+#define sizeofArray(x) (sizeof(x)/sizeof(x[0]))
+
+/* Image sensor initialization sequence. */
+void SensorInit(void) {
+	if (SensorI2cBusTest() != CY_U3P_SUCCESS) /* Verify that the sensor is connected. */
+	{
+		CyU3PDebugPrint(4, "Error: Reading Sensor ID failed!\r\n");
+		return;
+	}
+
+	SensorConfig(SENSOR_ADDR_WR,ov5642_init2);
+
+	/* Update sensor configuration based on desired video stream parameters. Using 720p 30fps as default setting.*/
+	//SensorScaling_HD720p_30fps();
+
+//	SensorConfig(ov5642_final, sizeofArray(ov5642_final));
 }
 
 

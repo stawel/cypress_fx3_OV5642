@@ -71,13 +71,7 @@
 #include "cyfxgpif2config.h"
 
 
-CyU3PReturnStatus_t CyFxGpioInit (void);
-CyBool_t
-CyFxUVCApplnUSBSetupCB_old (
-        uint32_t setupdat0, /* SETUP Data 0 */
-        uint32_t setupdat1  /* SETUP Data 1 */
-        );
-
+CyU3PReturnStatus_t SensorGpioInit (void);
 
 /*************************************************************************************************
                                          Global Variables
@@ -278,8 +272,9 @@ CyFxUVCApplnUSBSetupCB (
     CyBool_t uvcHandleReq = CyFalse;
     uint32_t status;
 
-	if(CyFxUVCApplnUSBSetupCB_old(setupdat0, setupdat1) == CyTrue)
-           return CyTrue;
+//  TODO: remove
+//	if(CyFxUVCApplnUSBSetupCB_old(setupdat0, setupdat1) == CyTrue)
+//           return CyTrue;
 
 
     /* Obtain Request Type and Request */
@@ -686,8 +681,7 @@ CyFxUVCApplnInit (void)
         CyFxAppErrorHandler (apiRetStatus);
     }
 
-    //stawel
-    CyFxGpioInit();
+    SensorGpioInit();
 
     /* Initialize the P-port. */
     pibclock.clkDiv      = 2;
