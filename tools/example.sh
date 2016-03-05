@@ -1,3 +1,5 @@
 
 
-echo -e "120\n12288\n10\n" | ./a.out output R 
+g++ debug.cpp -l cyusb -o debug
+
+./debug  R 0x78 0x3808

@@ -52,18 +52,19 @@ CyBool_t SensorDebugUSBSetup (uint32_t setupdat0, uint32_t setupdat1)
     	printState();
         uint8_t  i2cAddr, value;
     	uvcHandleReq = CyTrue;
-    	i2cAddr = wValue & 0x00ff;
-    	value = wLength;
+    	i2cAddr = wValue & 0x00fe;
+    	value = wValue >> 8;
         switch (bRequest)
         {
             case WRITE:
             	status = SensorWrite1B(i2cAddr, wIndex, value);
-                break;
+            	CyU3PDebugPrint (2, "SensorDebugUSBSetup write:  i2c: %x  addr: %x  val: %x (%d)\r\n", (int)i2cAddr, (int)wIndex, (int)value, (int)value);
+//                break;
 
             case READ:
-            	i2cAddr = wValue & 0x00ff;
+            	i2cAddr = (wValue & 0x00fe) +1;
             	status = SensorRead1B(i2cAddr, wIndex, &value);
-            	CyU3PDebugPrint (2, "SensorDebugUSBSetup:  i2c: %d  addr: %d  val: %d\r\n", (int)i2cAddr, (int)wIndex, (int)value);
+            	CyU3PDebugPrint (2, "SensorDebugUSBSetup read:  i2c: %x  addr: %x  val: %x (%d)\r\n", (int)i2cAddr, (int)wIndex, (int)value, (int)value);
                 break;
 
             default:
