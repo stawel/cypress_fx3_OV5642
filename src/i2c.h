@@ -3,7 +3,7 @@
 
 #include <cyu3types.h>
 
-//should end with {0xffff,0xff}
+//should end with {0x0000, 0x00}
 struct addrval_list {
  uint16_t addr;
  uint8_t value;

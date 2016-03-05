@@ -35,6 +35,7 @@
 #include <cyu3utils.h>
 #include "sensor.h"
 #include "../i2c.h"
+#include "ov5642_conifg.h"
 
 #define REG_CHIP_ID_HIGH                0x300a
 #define REG_CHIP_ID_LOW                 0x300b
@@ -53,100 +54,33 @@ uint8_t SensorI2cBusTest(void) {
 	return 1;
 }
 
-
-
 void SensorReset(void) {
 	CyU3PThreadSleep(10);
 	CyU3PThreadSleep(10);
 	return;
 }
 
-
-//OV5642_RGB_QVGA
-static struct addrval_list ov5642_init2[] = {
-#include "config.h"
-		{0xffff,0xff}
-};
-
-
 #define sizeofArray(x) (sizeof(x)/sizeof(x[0]))
 
 /* Image sensor initialization sequence. */
 void SensorInit(void) {
-	if (SensorI2cBusTest() != CY_U3P_SUCCESS) /* Verify that the sensor is connected. */
-	{
+	if (SensorI2cBusTest() != CY_U3P_SUCCESS) {
 		CyU3PDebugPrint(4, "Error: Reading Sensor ID failed!\r\n");
 		return;
 	}
 
-	SensorConfig(SENSOR_ADDR_WR,ov5642_init2);
-
-	/* Update sensor configuration based on desired video stream parameters. Using 720p 30fps as default setting.*/
-	//SensorScaling_HD720p_30fps();
-
-//	SensorConfig(ov5642_final, sizeofArray(ov5642_final));
+	SensorConfig(SENSOR_ADDR_WR, ov5642_init);
+	SensorScaling_HD720p_30fps();
 }
 
-
-/* Function to set the image sensor in VGA streaming mode. */
 void SensorScaling_VGA(void) {
-/*	Populate particular sensor control commands that will setup the image sensor to stream
-	640 * 480 at 15 FPS in this function.
- */
     return;
 }
 
-#define REG_WINDOW_START_X_HIGH         0x3800
-#define REG_WINDOW_START_X_LOW          0x3801
-#define REG_WINDOW_START_Y_HIGH         0x3802
-#define REG_WINDOW_START_Y_LOW          0x3803
-#define REG_WINDOW_WIDTH_HIGH           0x3804
-#define REG_WINDOW_WIDTH_LOW            0x3805
-#define REG_WINDOW_HEIGHT_HIGH          0x3806
-#define REG_WINDOW_HEIGHT_LOW           0x3807
-#define REG_OUT_WIDTH_HIGH              0x3808
-#define REG_OUT_WIDTH_LOW               0x3809
-#define REG_OUT_HEIGHT_HIGH             0x380a
-#define REG_OUT_HEIGHT_LOW              0x380b
-#define REG_OUT_TOTAL_WIDTH_HIGH        0x380c
-#define REG_OUT_TOTAL_WIDTH_LOW         0x380d
-#define REG_OUT_TOTAL_HEIGHT_HIGH       0x380e
-#define REG_OUT_TOTAL_HEIGHT_LOW        0x380f
-#define OV5642_WIDTH            1280
-#define OV5642_HEIGHT           720
-#define OV5642_TOTAL_WIDTH      3200
-#define OV5642_TOTAL_HEIGHT     2000
-#define OV5642_SENSOR_SIZE_X    2592
-#define OV5642_SENSOR_SIZE_Y    1944
-
-void setResolution(int width, int height)
-{
-	CyU3PDebugPrint(4, "setResolution: %dx%d !\r\n", width, height);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_WIDTH_HIGH, width >> 8);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_WIDTH_LOW, width & 0xff);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_HEIGHT_HIGH, height >> 8);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_WINDOW_HEIGHT_LOW, height & 0xff);
-
-	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_WIDTH_HIGH, width >> 8);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_WIDTH_LOW, width & 0xff);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_HEIGHT_HIGH, height >> 8);
-	SensorWrite1B(SENSOR_ADDR_WR, REG_OUT_HEIGHT_LOW, height & 0xff);
-
-}
-
-/* Function to set the image sensor in HD720 streaming mode. */
 void SensorScaling_HD720p_30fps(void) {
-/*	Populate particular sensor control commands that will setup the image sensor to stream
-	1280 * 720 at 30 FPS in this function.
- */
-
-	//setResolution(1280, 720);
     return;
 }
 
-/*
- Get the current brightness setting from the image sensor.
- */
 uint8_t SensorGetBrightness(void) {
 	uint8_t buf[2];
 /*
@@ -154,9 +88,6 @@ uint8_t SensorGetBrightness(void) {
 	return (uint8_t) buf[1];
 }
 
-/*
- Update the brightness setting for the image sensor.
- */
 void SensorSetBrightness(uint8_t brightness) {
 	//SensorWrite2B(SENSOR_ADDR_WR, 0x00, 0x02, 0x00, brightness);
 }

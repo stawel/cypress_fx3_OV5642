@@ -67,7 +67,7 @@ CyU3PReturnStatus_t SensorWrite1B(uint8_t slaveAddr, uint16_t addr, uint8_t data
 CyU3PReturnStatus_t SensorConfig(uint8_t slaveAddr, struct addrval_list * config)
 {
 	int i = 0;
-	while(config[i].addr != 0xffff) {
+	while(config[i].addr) {
 		if(SensorWrite1B(slaveAddr, config[i].addr, config[i].value) != CY_U3P_SUCCESS) {
 			CyU3PDebugPrint(4, "Error: SensorConfig: [%d] %x := %x !\r\n", i, config[i].addr, config[i].value);
 			return 1;
