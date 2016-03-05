@@ -79,7 +79,7 @@ void SensorScaling_VGA(void) {
 
 void SensorScaling_HD720p_30fps(void) {
 
-	SensorConfig(SENSOR_ADDR_WR, ov5642_svga_preview);
+	SensorConfig(SENSOR_ADDR_WR, ov5642_720p_preview);
 }
 
 uint8_t SensorGetBrightness(void) {
