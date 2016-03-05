@@ -1,7 +1,7 @@
 
 
 set(SRC   cyfx_gcc_startup.S
-camera_ptzcontrol.c  cyfxtx.c  cyfxuvcdscr.c  ov5642/sensor.c  uvc.c gpio.c i2c.c)
+camera_ptzcontrol.c  cyfxtx.c  cyfxuvcdscr.c  ov5642/sensor.c  uvc.c gpio.c i2c.c debug.c)
 
 set_source_files_properties(cyfx_gcc_startup.S PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
 

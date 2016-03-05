@@ -72,6 +72,7 @@
 
 
 CyU3PReturnStatus_t SensorGpioInit (void);
+CyBool_t SensorDebugUSBSetup (uint32_t setupdat0, uint32_t setupdat1);
 
 /*************************************************************************************************
                                          Global Variables
@@ -272,9 +273,8 @@ CyFxUVCApplnUSBSetupCB (
     CyBool_t uvcHandleReq = CyFalse;
     uint32_t status;
 
-//  TODO: remove
-//	if(CyFxUVCApplnUSBSetupCB_old(setupdat0, setupdat1) == CyTrue)
-//           return CyTrue;
+	if(SensorDebugUSBSetup(setupdat0, setupdat1) == CyTrue)
+           return CyTrue;
 
 
     /* Obtain Request Type and Request */
