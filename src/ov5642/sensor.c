@@ -74,6 +74,8 @@ void SensorInit(void) {
 }
 
 void SensorScaling_VGA(void) {
+	//TODO:??
+	SensorConfig(SENSOR_ADDR_WR, ov5642_vga_preview);
     return;
 }
 
