@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
 	printf("i2c: %02x addr: %04x value: %02x\n", i2c, addr, value);
 
-	if ( argv[1][0] == 'W' ) {
+	if ( argv[1][0] == 'W' && argc == 5) {
 	      control_transfer_write(i2c, addr, value);
 	   printf("Completed writing\n");
 	} else {

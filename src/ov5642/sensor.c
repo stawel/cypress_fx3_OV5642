@@ -57,6 +57,7 @@ uint8_t SensorI2cBusTest(void) {
 void SensorReset(void) {
 	CyU3PThreadSleep(10);
 	CyU3PThreadSleep(10);
+	CyU3PDebugPrint(4, "SensorReset (empty) \r\n");
 	return;
 }
 
@@ -69,18 +70,20 @@ void SensorInit(void) {
 		return;
 	}
 
+	CyU3PDebugPrint(4, "SensorInit \r\n");
 	SensorConfig(SENSOR_ADDR_WR, ov5642_init);
 	SensorScaling_HD720p_30fps();
 }
 
 void SensorScaling_VGA(void) {
 	//TODO:??
+	CyU3PDebugPrint(4, "SensorScaling_VGA \r\n");
 	SensorConfig(SENSOR_ADDR_WR, ov5642_vga_preview);
     return;
 }
 
 void SensorScaling_HD720p_30fps(void) {
-
+	CyU3PDebugPrint(4, "SensorScaling_HD720p_30fps \r\n");
 	SensorConfig(SENSOR_ADDR_WR, ov5642_720p_preview);
 }
 
@@ -88,9 +91,12 @@ uint8_t SensorGetBrightness(void) {
 	uint8_t buf[2];
 /*
 	SensorRead2B(SENSOR_ADDR_RD, 0x00, 0x02, buf);*/
+	CyU3PDebugPrint(4, "SensorGetBrightness \r\n");
+
 	return (uint8_t) buf[1];
 }
 
 void SensorSetBrightness(uint8_t brightness) {
 	//SensorWrite2B(SENSOR_ADDR_WR, 0x00, 0x02, 0x00, brightness);
+	CyU3PDebugPrint(4, "SensorGetBrightness %d\r\n", (int) brightness);
 }
