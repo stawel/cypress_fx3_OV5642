@@ -162,6 +162,8 @@ volatile static CyBool_t gotPartial = CyFalse;          /* Helps track the last 
                                                          * to make sure it is committed to USB.
                                                          */
 
+volatile static uint16_t maxDiff = 0;
+
 /* Add the UVC packet header to the top of the specified DMA buffer. */
 void
 CyFxUVCAddHeader (
@@ -978,6 +980,9 @@ UVCAppThread_Entry (
 
                 /* Commit the updated DMA buffer to the USB endpoint. */
                 prodCount++;
+                if(prodCount - consCount > maxDiff) {
+                	maxDiff = prodCount - consCount;
+                }
                 apiRetStatus = CyU3PDmaMultiChannelCommitBuffer (&glChHandleUVCStream,
                         produced_buffer.count + CY_FX_UVC_MAX_HEADER, 0);
                 if (apiRetStatus != CY_U3P_SUCCESS)
@@ -1002,8 +1007,9 @@ UVCAppThread_Entry (
 #endif
 
 #ifdef DEBUG_PRINT_FRAME_COUNT
-                CyU3PDebugPrint (4, "frame %d\r\n", frameCnt++);
+                CyU3PDebugPrint (4, "frame %d  diff %d\r\n", frameCnt++, (int)maxDiff);
 #endif
+                maxDiff = 0;
 
                 /* Toggle UVC header FRAME ID bit */
                 glUVCHeader[1] ^= CY_FX_UVC_HEADER_FRAME_ID;
